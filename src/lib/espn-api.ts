@@ -18,22 +18,51 @@ export async function fetchCFPRankings(): Promise<ESPNTeam[]> {
     
     const data = await response.json()
     
-    const rankings = data.rankings?.[0]?.ranks || []
+    let rankings = data.rankings?.[0]?.ranks || []
     
     if (rankings.length === 0) {
-      throw new Error('No rankings data available')
+      const allRankings = data.rankings || []
+      for (const ranking of allRankings) {
+        if (ranking.ranks && ranking.ranks.length > 0) {
+          rankings = ranking.ranks
+          break
+        }
+      }
     }
     
-    const teams: ESPNTeam[] = rankings.slice(0, 14).map((rank: any) => ({
-      rank: rank.current,
-      name: rank.team?.displayName || rank.team?.name || 'Unknown',
-      abbreviation: rank.team?.abbreviation || '',
-      logo: rank.team?.logos?.[0]?.href || rank.team?.logo || '',
-      id: rank.team?.id?.toString() || '',
-      recordSummary: rank.recordSummary || ''
-    }))
+    if (rankings.length === 0) {
+      throw new Error('No rankings data available from ESPN API')
+    }
     
-    return teams
+    const teams: ESPNTeam[] = rankings.slice(0, 14).map((rank: any) => {
+      const team = rank.team || {}
+      const teamName = team.displayName || team.name || team.location || 'Unknown Team'
+      const teamAbbr = team.abbreviation || team.shortDisplayName || ''
+      
+      let logoUrl = ''
+      if (team.logos && Array.isArray(team.logos) && team.logos.length > 0) {
+        logoUrl = team.logos[0].href || team.logos[0].url || ''
+      } else if (team.logo) {
+        logoUrl = team.logo
+      }
+      
+      return {
+        rank: rank.current || rank.rank || 0,
+        name: teamName,
+        abbreviation: teamAbbr,
+        logo: logoUrl,
+        id: team.id?.toString() || team.uid || rank.current?.toString() || '',
+        recordSummary: rank.recordSummary || team.record || ''
+      }
+    })
+    
+    const validTeams = teams.filter(t => t.rank > 0 && t.name !== 'Unknown Team')
+    
+    if (validTeams.length < 12) {
+      throw new Error(`Insufficient valid teams found. Got ${validTeams.length}, need at least 12`)
+    }
+    
+    return validTeams
   } catch (error) {
     console.error('Error fetching CFP rankings:', error)
     throw error

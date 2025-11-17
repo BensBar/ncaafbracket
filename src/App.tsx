@@ -21,14 +21,15 @@ function App() {
     setIsLoading(true)
     try {
       const rankings = await fetchCFPRankings()
+      console.log('Fetched rankings:', rankings)
       setTeams(() => rankings)
       setLastUpdate(() => Date.now())
       if (showToast) {
-        toast.success(`Rankings updated! ${rankings.length} teams loaded.`)
+        toast.success(`Rankings updated! Top ${rankings.length} teams loaded from ESPN CFP Rankings.`)
       }
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : "Failed to fetch rankings"
-      toast.error(errorMessage)
+      toast.error(`Update failed: ${errorMessage}`)
       console.error("Error updating rankings:", error)
     } finally {
       setIsLoading(false)
