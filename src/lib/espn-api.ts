@@ -10,7 +10,7 @@ export interface ESPNTeam {
 export async function fetchCFPRankings(): Promise<ESPNTeam[]> {
   try {
     const timestamp = Date.now()
-    const response = await fetch(`https://site.api.espn.com/apis/site/v2/sports/football/college-football/rankings/1?_=${timestamp}`)
+    const response = await fetch(`https://site.api.espn.com/apis/site/v2/sports/football/college-football/rankings?_=${timestamp}`)
     
     if (!response.ok) {
       throw new Error(`Failed to fetch rankings: ${response.status} ${response.statusText}`)
@@ -19,25 +19,49 @@ export async function fetchCFPRankings(): Promise<ESPNTeam[]> {
     const data = await response.json()
     console.log('ESPN API Response:', data)
     
-    let rankings = data.rankings?.[0]?.ranks || []
+    let rankings = []
+    const allRankings = data.rankings || []
     
-    if (rankings.length === 0) {
-      const allRankings = data.rankings || []
-      console.log('Searching through all rankings:', allRankings.length)
+    console.log('Available rankings:', allRankings.map((r: any) => ({ 
+      name: r.name, 
+      shortName: r.shortName,
+      type: r.type,
+      ranksCount: r.ranks?.length || 0 
+    })))
+    
+    for (const ranking of allRankings) {
+      const rankingName = (ranking.name || ranking.shortName || '').toLowerCase()
+      console.log('Checking ranking:', rankingName)
+      
+      if (rankingName.includes('playoff') || rankingName.includes('cfp')) {
+        rankings = ranking.ranks || []
+        console.log('Found CFP rankings with', rankings.length, 'teams')
+        break
+      }
+    }
+    
+    if (rankings.length === 0 && allRankings.length > 0) {
+      console.log('No CFP rankings found, using AP Poll as fallback')
       for (const ranking of allRankings) {
-        console.log('Ranking type:', ranking.type, 'Ranks:', ranking.ranks?.length || 0)
-        if (ranking.ranks && ranking.ranks.length > 0) {
-          rankings = ranking.ranks
+        const rankingName = (ranking.name || ranking.shortName || '').toLowerCase()
+        if (rankingName.includes('ap') || rankingName.includes('associated press')) {
+          rankings = ranking.ranks || []
+          console.log('Found AP Poll with', rankings.length, 'teams')
           break
         }
       }
+    }
+    
+    if (rankings.length === 0 && allRankings.length > 0) {
+      rankings = allRankings[0]?.ranks || []
+      console.log('Using first available ranking with', rankings.length, 'teams')
     }
     
     if (rankings.length === 0) {
       throw new Error('No rankings data available from ESPN API')
     }
     
-    console.log('Raw rankings data:', rankings.slice(0, 3))
+    console.log('Raw rankings data (first 3):', rankings.slice(0, 3))
     
     const teams: ESPNTeam[] = rankings.slice(0, 14).map((rank: any) => {
       const team = rank.team || {}
@@ -61,7 +85,7 @@ export async function fetchCFPRankings(): Promise<ESPNTeam[]> {
       }
     })
     
-    console.log('Processed teams:', teams.slice(0, 3))
+    console.log('Processed teams (first 3):', teams.slice(0, 3))
     
     const validTeams = teams.filter(t => t.rank > 0 && t.name !== 'Unknown Team')
     

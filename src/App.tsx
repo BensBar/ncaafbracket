@@ -25,7 +25,7 @@ function App() {
       setTeams(() => rankings)
       setLastUpdate(() => Date.now())
       if (showToast) {
-        toast.success(`Rankings updated! Top ${rankings.length} teams loaded from ESPN CFP Rankings.`)
+        toast.success(`Rankings updated! Top ${rankings.length} teams loaded.`)
       }
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : "Failed to fetch rankings"
@@ -37,7 +37,7 @@ function App() {
   }
 
   useEffect(() => {
-    if ((teams?.length || 0) === 0 || shouldUpdate(lastUpdate || 0, 8)) {
+    if ((teams?.length || 0) === 0 || shouldUpdate(lastUpdate || 0, 0.1)) {
       updateRankings(false)
     }
   }, [])
