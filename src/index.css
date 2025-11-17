@@ -12,7 +12,7 @@
 }
 
 :root {
-  --background: oklch(0.15 0.02 250);
+  --background: oklch(0 0 0);
   --foreground: oklch(1 0 0);
   
   --card: oklch(0.30 0.015 250);
