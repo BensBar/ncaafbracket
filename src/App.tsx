@@ -156,9 +156,6 @@ function App() {
             >
               <div className="relative">
                 <div className="absolute inset-0 bg-accent/20 blur-3xl rounded-full"></div>
-                <div className="relative bg-card/50 backdrop-blur-sm border-2 border-primary rounded-full p-6">
-                  <img src={trophyBlack} alt="Trophy" className="w-[80px] h-[80px] object-contain" />
-                </div>
               </div>
               <div className="mt-4 text-center">
                 <div className="text-sm font-bold text-primary uppercase tracking-wider">NATIONAL</div>
