@@ -63,7 +63,7 @@ export async function fetchCFPRankings(): Promise<ESPNTeam[]> {
     
     console.log('Raw rankings data (first 3):', rankings.slice(0, 3))
     
-    const teams: ESPNTeam[] = rankings.slice(0, 14).map((rank: any) => {
+    const teams: ESPNTeam[] = rankings.slice(0, 20).map((rank: any) => {
       const team = rank.team || {}
       const teamName = team.displayName || team.name || team.location || 'Unknown Team'
       const teamAbbr = team.abbreviation || team.shortDisplayName || ''
