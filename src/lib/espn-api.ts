@@ -10,19 +10,22 @@ export interface ESPNTeam {
 export async function fetchCFPRankings(): Promise<ESPNTeam[]> {
   try {
     const timestamp = Date.now()
-    const response = await fetch(`https://site.api.espn.com/apis/site/v2/sports/football/college-football/rankings/4?_=${timestamp}`)
+    const response = await fetch(`https://site.api.espn.com/apis/site/v2/sports/football/college-football/rankings/1?_=${timestamp}`)
     
     if (!response.ok) {
       throw new Error(`Failed to fetch rankings: ${response.status} ${response.statusText}`)
     }
     
     const data = await response.json()
+    console.log('ESPN API Response:', data)
     
     let rankings = data.rankings?.[0]?.ranks || []
     
     if (rankings.length === 0) {
       const allRankings = data.rankings || []
+      console.log('Searching through all rankings:', allRankings.length)
       for (const ranking of allRankings) {
+        console.log('Ranking type:', ranking.type, 'Ranks:', ranking.ranks?.length || 0)
         if (ranking.ranks && ranking.ranks.length > 0) {
           rankings = ranking.ranks
           break
@@ -33,6 +36,8 @@ export async function fetchCFPRankings(): Promise<ESPNTeam[]> {
     if (rankings.length === 0) {
       throw new Error('No rankings data available from ESPN API')
     }
+    
+    console.log('Raw rankings data:', rankings.slice(0, 3))
     
     const teams: ESPNTeam[] = rankings.slice(0, 14).map((rank: any) => {
       const team = rank.team || {}
@@ -55,6 +60,8 @@ export async function fetchCFPRankings(): Promise<ESPNTeam[]> {
         recordSummary: rank.recordSummary || team.record || ''
       }
     })
+    
+    console.log('Processed teams:', teams.slice(0, 3))
     
     const validTeams = teams.filter(t => t.rank > 0 && t.name !== 'Unknown Team')
     
