@@ -63,7 +63,7 @@ function App() {
   }, [lastUpdate])
 
   const playoffTeams = teams?.slice(0, 12) || []
-  const leftOutTeams = teams?.slice(12, 14) || []
+  const leftOutTeams = teams?.slice(12, 20) || []
 
   const firstRoundMatchups = [
     [playoffTeams[4], playoffTeams[11]],
