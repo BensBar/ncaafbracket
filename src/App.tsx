@@ -156,7 +156,7 @@ function App() {
             >
               <div className="relative">
                 <div className="absolute inset-0 bg-accent/20 blur-3xl rounded-full"></div>
-                
+                <img src={trophyBlack} alt="Trophy" className="w-[240px] h-[240px] object-contain" />
               </div>
               <div className="mt-4 text-center">
                 <div className="text-sm font-bold text-primary uppercase tracking-wider">NATIONAL</div>
