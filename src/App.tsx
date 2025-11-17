@@ -17,15 +17,18 @@ function App() {
   const [isLoading, setIsLoading] = useState(false)
   const [nextUpdateIn, setNextUpdateIn] = useState("")
 
-  const updateRankings = async () => {
+  const updateRankings = async (showToast = true) => {
     setIsLoading(true)
     try {
       const rankings = await fetchCFPRankings()
       setTeams(() => rankings)
       setLastUpdate(() => Date.now())
-      toast.success("Rankings updated successfully!")
+      if (showToast) {
+        toast.success(`Rankings updated! ${rankings.length} teams loaded.`)
+      }
     } catch (error) {
-      toast.error("Failed to fetch rankings. Please try again.")
+      const errorMessage = error instanceof Error ? error.message : "Failed to fetch rankings"
+      toast.error(errorMessage)
       console.error("Error updating rankings:", error)
     } finally {
       setIsLoading(false)
@@ -34,7 +37,7 @@ function App() {
 
   useEffect(() => {
     if ((teams?.length || 0) === 0 || shouldUpdate(lastUpdate || 0, 8)) {
-      updateRankings()
+      updateRankings(false)
     }
   }, [])
 
@@ -46,7 +49,7 @@ function App() {
       const timeRemaining = eightHours - timeSinceUpdate
 
       if (timeRemaining <= 0) {
-        updateRankings()
+        updateRankings(false)
       } else {
         const hours = Math.floor(timeRemaining / (60 * 60 * 1000))
         const minutes = Math.floor((timeRemaining % (60 * 60 * 1000)) / (60 * 1000))
@@ -104,7 +107,7 @@ function App() {
           </div>
           <div className="flex gap-2">
             <Button 
-              onClick={updateRankings} 
+              onClick={() => updateRankings(true)} 
               disabled={isLoading}
               variant="outline"
               className="gap-2"

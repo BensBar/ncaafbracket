@@ -9,22 +9,27 @@ export interface ESPNTeam {
 
 export async function fetchCFPRankings(): Promise<ESPNTeam[]> {
   try {
-    const response = await fetch('https://site.api.espn.com/apis/site/v2/sports/football/college-football/rankings/4')
+    const timestamp = Date.now()
+    const response = await fetch(`https://site.api.espn.com/apis/site/v2/sports/football/college-football/rankings/4?_=${timestamp}`)
     
     if (!response.ok) {
-      throw new Error('Failed to fetch rankings')
+      throw new Error(`Failed to fetch rankings: ${response.status} ${response.statusText}`)
     }
     
     const data = await response.json()
     
     const rankings = data.rankings?.[0]?.ranks || []
     
+    if (rankings.length === 0) {
+      throw new Error('No rankings data available')
+    }
+    
     const teams: ESPNTeam[] = rankings.slice(0, 14).map((rank: any) => ({
       rank: rank.current,
-      name: rank.team?.name || rank.team?.displayName || 'Unknown',
+      name: rank.team?.displayName || rank.team?.name || 'Unknown',
       abbreviation: rank.team?.abbreviation || '',
       logo: rank.team?.logos?.[0]?.href || rank.team?.logo || '',
-      id: rank.team?.id || '',
+      id: rank.team?.id?.toString() || '',
       recordSummary: rank.recordSummary || ''
     }))
     
