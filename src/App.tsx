@@ -158,7 +158,7 @@ function App() {
                 <div className="absolute inset-0 bg-accent/20 blur-3xl rounded-full"></div>
               </div>
               <div className="mt-4 text-center">
-                <div className="text-sm font-bold text-primary uppercase tracking-wider">National</div>
+                <div className="text-sm font-bold text-primary uppercase tracking-wider">NATIONAL</div>
                 <div className="text-xs text-muted-foreground uppercase">Championship</div>
               </div>
             </motion.div>
