@@ -6,7 +6,8 @@ import { EditBracketDialog } from "@/components/EditBracketDialog"
 import { Card } from "@/components/ui/card"
 import { Separator } from "@/components/ui/separator"
 import { Button } from "@/components/ui/button"
-import { Trophy, ArrowsClockwise, Clock } from "@phosphor-icons/react"
+import { ArrowsClockwise, Clock } from "@phosphor-icons/react"
+import trophyBlack from "@/assets/images/trophy_black.jpg"
 import { motion } from "framer-motion"
 import { fetchCFPRankings, ESPNTeam, shouldUpdate } from "@/lib/espn-api"
 import { toast } from "sonner"
@@ -156,7 +157,7 @@ function App() {
               <div className="relative">
                 <div className="absolute inset-0 bg-accent/20 blur-3xl rounded-full"></div>
                 <div className="relative bg-card/50 backdrop-blur-sm border-2 border-primary rounded-full p-8">
-                  <Trophy size={80} weight="fill" className="text-primary" />
+                  <img src={trophyBlack} alt="Trophy" className="w-20 h-20 object-contain" />
                 </div>
               </div>
               <div className="mt-4 text-center">
@@ -203,7 +204,7 @@ function App() {
               <div className="relative">
                 <div className="absolute inset-0 bg-accent/20 blur-2xl rounded-full"></div>
                 <div className="relative bg-card/50 backdrop-blur-sm border-2 border-primary rounded-full p-6">
-                  <Trophy size={60} weight="fill" className="text-primary" />
+                  <img src={trophyBlack} alt="Trophy" className="w-[60px] h-[60px] object-contain" />
                 </div>
               </div>
               <div className="mt-3">
