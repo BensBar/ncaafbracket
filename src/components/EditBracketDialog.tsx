@@ -4,15 +4,11 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { PencilSimple } from "@phosphor-icons/react"
-
-interface Team {
-  rank: number
-  name: string
-}
+import { ESPNTeam } from "@/lib/espn-api"
 
 interface EditBracketDialogProps {
-  teams: Team[]
-  onSave: (teams: Team[]) => void
+  teams: ESPNTeam[]
+  onSave: (teams: ESPNTeam[]) => void
 }
 
 export function EditBracketDialog({ teams, onSave }: EditBracketDialogProps) {

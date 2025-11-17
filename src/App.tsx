@@ -1,36 +1,61 @@
 import { useKV } from "@github/spark/hooks"
+import { useEffect, useState } from "react"
 import { TeamCard } from "@/components/TeamCard"
 import { BracketConnector } from "@/components/BracketConnector"
 import { EditBracketDialog } from "@/components/EditBracketDialog"
 import { Card } from "@/components/ui/card"
 import { Separator } from "@/components/ui/separator"
-import { Trophy } from "@phosphor-icons/react"
+import { Button } from "@/components/ui/button"
+import { Trophy, ArrowsClockwise, Clock } from "@phosphor-icons/react"
 import { motion } from "framer-motion"
-
-interface Team {
-  rank: number
-  name: string
-}
-
-const DEFAULT_TEAMS: Team[] = [
-  { rank: 1, name: "Oregon" },
-  { rank: 2, name: "Georgia" },
-  { rank: 3, name: "Texas" },
-  { rank: 4, name: "Penn State" },
-  { rank: 5, name: "Notre Dame" },
-  { rank: 6, name: "Ohio State" },
-  { rank: 7, name: "Tennessee" },
-  { rank: 8, name: "Indiana" },
-  { rank: 9, name: "Boise State" },
-  { rank: 10, name: "SMU" },
-  { rank: 11, name: "Alabama" },
-  { rank: 12, name: "Arizona State" },
-  { rank: 13, name: "Miami" },
-  { rank: 14, name: "South Carolina" },
-]
+import { fetchCFPRankings, ESPNTeam, shouldUpdate } from "@/lib/espn-api"
+import { toast } from "sonner"
 
 function App() {
-  const [teams, setTeams] = useKV<Team[]>("cfp-teams", DEFAULT_TEAMS)
+  const [teams, setTeams] = useKV<ESPNTeam[]>("cfp-teams", [])
+  const [lastUpdate, setLastUpdate] = useKV<number>("cfp-last-update", 0)
+  const [isLoading, setIsLoading] = useState(false)
+  const [nextUpdateIn, setNextUpdateIn] = useState("")
+
+  const updateRankings = async () => {
+    setIsLoading(true)
+    try {
+      const rankings = await fetchCFPRankings()
+      setTeams(() => rankings)
+      setLastUpdate(() => Date.now())
+      toast.success("Rankings updated successfully!")
+    } catch (error) {
+      toast.error("Failed to fetch rankings. Please try again.")
+      console.error("Error updating rankings:", error)
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  useEffect(() => {
+    if ((teams?.length || 0) === 0 || shouldUpdate(lastUpdate || 0, 8)) {
+      updateRankings()
+    }
+  }, [])
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      const now = Date.now()
+      const timeSinceUpdate = now - (lastUpdate || 0)
+      const eightHours = 8 * 60 * 60 * 1000
+      const timeRemaining = eightHours - timeSinceUpdate
+
+      if (timeRemaining <= 0) {
+        updateRankings()
+      } else {
+        const hours = Math.floor(timeRemaining / (60 * 60 * 1000))
+        const minutes = Math.floor((timeRemaining % (60 * 60 * 1000)) / (60 * 1000))
+        setNextUpdateIn(`${hours}h ${minutes}m`)
+      }
+    }, 60000)
+
+    return () => clearInterval(interval)
+  }, [lastUpdate])
 
   const playoffTeams = teams?.slice(0, 12) || []
   const leftOutTeams = teams?.slice(12, 14) || []
@@ -57,8 +82,8 @@ function App() {
     return (
       <div className="min-h-screen bg-background text-foreground flex items-center justify-center">
         <div className="text-center">
-          <Trophy size={64} weight="fill" className="text-primary mx-auto mb-4" />
-          <p className="text-muted-foreground">Loading bracket...</p>
+          <ArrowsClockwise size={64} weight="bold" className="text-primary mx-auto mb-4 animate-spin" />
+          <p className="text-muted-foreground">Loading bracket from ESPN...</p>
         </div>
       </div>
     )
@@ -72,21 +97,35 @@ function App() {
             <h1 className="text-3xl md:text-4xl font-bold uppercase tracking-tight mb-2">
               College Football Playoff
             </h1>
-            <p className="text-muted-foreground text-sm">12-Team Bracket</p>
+            <div className="flex items-center gap-2 text-muted-foreground text-sm">
+              <Clock size={16} />
+              <span>Next update in: {nextUpdateIn || "Calculating..."}</span>
+            </div>
           </div>
-          <EditBracketDialog teams={teams} onSave={setTeams} />
+          <div className="flex gap-2">
+            <Button 
+              onClick={updateRankings} 
+              disabled={isLoading}
+              variant="outline"
+              className="gap-2"
+            >
+              <ArrowsClockwise size={18} weight="bold" className={isLoading ? "animate-spin" : ""} />
+              Refresh Now
+            </Button>
+            <EditBracketDialog teams={teams || []} onSave={(updatedTeams) => setTeams(() => updatedTeams)} />
+          </div>
         </div>
 
         <div className="hidden lg:block">
           <div className="flex items-center justify-center gap-4">
             <div className="flex flex-col gap-8">
               <div className="flex flex-col gap-4">
-                <TeamCard rank={firstRoundMatchups[0][0].rank} name={firstRoundMatchups[0][0].name} delay={0.1} />
-                <TeamCard rank={firstRoundMatchups[0][1].rank} name={firstRoundMatchups[0][1].name} delay={0.15} />
+                <TeamCard rank={firstRoundMatchups[0][0].rank} name={firstRoundMatchups[0][0].name} logo={firstRoundMatchups[0][0].logo} delay={0.1} />
+                <TeamCard rank={firstRoundMatchups[0][1].rank} name={firstRoundMatchups[0][1].name} logo={firstRoundMatchups[0][1].logo} delay={0.15} />
               </div>
               <div className="flex flex-col gap-4">
-                <TeamCard rank={firstRoundMatchups[1][0].rank} name={firstRoundMatchups[1][0].name} delay={0.2} />
-                <TeamCard rank={firstRoundMatchups[1][1].rank} name={firstRoundMatchups[1][1].name} delay={0.25} />
+                <TeamCard rank={firstRoundMatchups[1][0].rank} name={firstRoundMatchups[1][0].name} logo={firstRoundMatchups[1][0].logo} delay={0.2} />
+                <TeamCard rank={firstRoundMatchups[1][1].rank} name={firstRoundMatchups[1][1].name} logo={firstRoundMatchups[1][1].logo} delay={0.25} />
               </div>
             </div>
 
@@ -96,8 +135,8 @@ function App() {
             </div>
 
             <div className="flex flex-col gap-16">
-              {quarterfinalsSeeds[0] && <TeamCard rank={quarterfinalsSeeds[0].rank} name={quarterfinalsSeeds[0].name} delay={0.3} />}
-              {quarterfinalsSeeds[2] && <TeamCard rank={quarterfinalsSeeds[2].rank} name={quarterfinalsSeeds[2].name} delay={0.35} />}
+              {quarterfinalsSeeds[0] && <TeamCard rank={quarterfinalsSeeds[0].rank} name={quarterfinalsSeeds[0].name} logo={quarterfinalsSeeds[0].logo} delay={0.3} />}
+              {quarterfinalsSeeds[2] && <TeamCard rank={quarterfinalsSeeds[2].rank} name={quarterfinalsSeeds[2].name} logo={quarterfinalsSeeds[2].logo} delay={0.35} />}
             </div>
 
             <div className="flex flex-col justify-center">
@@ -127,8 +166,8 @@ function App() {
             </div>
 
             <div className="flex flex-col gap-16">
-              {quarterfinalsSeeds[4] && <TeamCard rank={quarterfinalsSeeds[4].rank} name={quarterfinalsSeeds[4].name} delay={0.5} />}
-              {quarterfinalsSeeds[6] && <TeamCard rank={quarterfinalsSeeds[6].rank} name={quarterfinalsSeeds[6].name} delay={0.55} />}
+              {quarterfinalsSeeds[4] && <TeamCard rank={quarterfinalsSeeds[4].rank} name={quarterfinalsSeeds[4].name} logo={quarterfinalsSeeds[4].logo} delay={0.5} />}
+              {quarterfinalsSeeds[6] && <TeamCard rank={quarterfinalsSeeds[6].rank} name={quarterfinalsSeeds[6].name} logo={quarterfinalsSeeds[6].logo} delay={0.55} />}
             </div>
 
             <div className="flex flex-col gap-8">
@@ -138,12 +177,12 @@ function App() {
 
             <div className="flex flex-col gap-8">
               <div className="flex flex-col gap-4">
-                <TeamCard rank={firstRoundMatchups[2][0].rank} name={firstRoundMatchups[2][0].name} delay={0.6} />
-                <TeamCard rank={firstRoundMatchups[2][1].rank} name={firstRoundMatchups[2][1].name} delay={0.65} />
+                <TeamCard rank={firstRoundMatchups[2][0].rank} name={firstRoundMatchups[2][0].name} logo={firstRoundMatchups[2][0].logo} delay={0.6} />
+                <TeamCard rank={firstRoundMatchups[2][1].rank} name={firstRoundMatchups[2][1].name} logo={firstRoundMatchups[2][1].logo} delay={0.65} />
               </div>
               <div className="flex flex-col gap-4">
-                <TeamCard rank={firstRoundMatchups[3][0].rank} name={firstRoundMatchups[3][0].name} delay={0.7} />
-                <TeamCard rank={firstRoundMatchups[3][1].rank} name={firstRoundMatchups[3][1].name} delay={0.75} />
+                <TeamCard rank={firstRoundMatchups[3][0].rank} name={firstRoundMatchups[3][0].name} logo={firstRoundMatchups[3][0].logo} delay={0.7} />
+                <TeamCard rank={firstRoundMatchups[3][1].rank} name={firstRoundMatchups[3][1].name} logo={firstRoundMatchups[3][1].logo} delay={0.75} />
               </div>
             </div>
           </div>
@@ -172,10 +211,10 @@ function App() {
           <div>
             <h3 className="text-lg font-bold mb-3 text-primary uppercase">Quarterfinals</h3>
             <div className="space-y-3">
-              {quarterfinalsSeeds[0] && <TeamCard rank={quarterfinalsSeeds[0].rank} name={quarterfinalsSeeds[0].name} />}
-              {quarterfinalsSeeds[2] && <TeamCard rank={quarterfinalsSeeds[2].rank} name={quarterfinalsSeeds[2].name} />}
-              {quarterfinalsSeeds[4] && <TeamCard rank={quarterfinalsSeeds[4].rank} name={quarterfinalsSeeds[4].name} />}
-              {quarterfinalsSeeds[6] && <TeamCard rank={quarterfinalsSeeds[6].rank} name={quarterfinalsSeeds[6].name} />}
+              {quarterfinalsSeeds[0] && <TeamCard rank={quarterfinalsSeeds[0].rank} name={quarterfinalsSeeds[0].name} logo={quarterfinalsSeeds[0].logo} />}
+              {quarterfinalsSeeds[2] && <TeamCard rank={quarterfinalsSeeds[2].rank} name={quarterfinalsSeeds[2].name} logo={quarterfinalsSeeds[2].logo} />}
+              {quarterfinalsSeeds[4] && <TeamCard rank={quarterfinalsSeeds[4].rank} name={quarterfinalsSeeds[4].name} logo={quarterfinalsSeeds[4].logo} />}
+              {quarterfinalsSeeds[6] && <TeamCard rank={quarterfinalsSeeds[6].rank} name={quarterfinalsSeeds[6].name} logo={quarterfinalsSeeds[6].logo} />}
             </div>
           </div>
 
@@ -187,8 +226,8 @@ function App() {
               {firstRoundMatchups.map((matchup, idx) => (
                 <Card key={idx} className="bg-secondary/50 border-border p-3">
                   <div className="space-y-2">
-                    <TeamCard rank={matchup[0].rank} name={matchup[0].name} />
-                    <TeamCard rank={matchup[1].rank} name={matchup[1].name} />
+                    <TeamCard rank={matchup[0].rank} name={matchup[0].name} logo={matchup[0].logo} />
+                    <TeamCard rank={matchup[1].rank} name={matchup[1].name} logo={matchup[1].logo} />
                   </div>
                 </Card>
               ))}
@@ -213,7 +252,7 @@ function App() {
             <div className="flex justify-center gap-4 flex-wrap">
               {leftOutTeams.map((team) => (
                 <div key={team.rank} className="opacity-60">
-                  <TeamCard rank={team.rank} name={team.name} />
+                  <TeamCard rank={team.rank} name={team.name} logo={team.logo} />
                 </div>
               ))}
             </div>

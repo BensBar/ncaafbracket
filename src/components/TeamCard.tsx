@@ -5,10 +5,11 @@ import { motion } from "framer-motion"
 interface TeamCardProps {
   rank: number
   name: string
+  logo?: string
   delay?: number
 }
 
-export function TeamCard({ rank, name, delay = 0 }: TeamCardProps) {
+export function TeamCard({ rank, name, logo, delay = 0 }: TeamCardProps) {
   return (
     <motion.div
       initial={{ opacity: 0, x: -20 }}
@@ -20,6 +21,16 @@ export function TeamCard({ rank, name, delay = 0 }: TeamCardProps) {
           <Badge className="bg-accent text-accent-foreground font-bold text-sm shrink-0 h-8 w-8 flex items-center justify-center rounded-full">
             {rank}
           </Badge>
+          {logo && (
+            <img 
+              src={logo} 
+              alt={`${name} logo`} 
+              className="w-8 h-8 object-contain shrink-0"
+              onError={(e) => {
+                e.currentTarget.style.display = 'none'
+              }}
+            />
+          )}
           <div className="font-semibold text-foreground text-sm leading-tight">
             {name}
           </div>

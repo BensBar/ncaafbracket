@@ -20,18 +20,18 @@ A College Football Playoff bracket visualization that displays the top 12 NCAAF 
 - **Success criteria**: All 12 teams visible in proper bracket positions with clear visual hierarchy
 
 ### Team Rankings
-- **Functionality**: Displays teams with their ranking (1-12) and school name
-- **Purpose**: Shows current playoff seeding and team identity
+- **Functionality**: Displays teams with their ranking (1-12), school name, and official team logos from ESPN
+- **Purpose**: Shows current playoff seeding and team identity with recognizable branding
 - **Trigger**: Automatic on load
-- **Progression**: Rankings displayed prominently → Teams ordered by seed → First round matchups show appropriate seeding
-- **Success criteria**: Rankings clearly visible, teams properly seeded in bracket structure
+- **Progression**: Rankings displayed prominently → Team logos appear beside names → Teams ordered by seed → First round matchups show appropriate seeding
+- **Success criteria**: Rankings clearly visible, teams properly seeded in bracket structure, logos load successfully
 
 ### Weekly Updates
-- **Functionality**: Admin can update the team list to reflect current week's rankings
-- **Purpose**: Keeps bracket current throughout the season
-- **Trigger**: User clicks update/edit button
-- **Progression**: Edit mode activates → Input fields for 14 teams → Save → Bracket refreshes with new teams
-- **Success criteria**: Teams persist between sessions and can be easily updated
+- **Functionality**: Automatically fetches latest CFP rankings from ESPN API every 8 hours; manual refresh button available
+- **Purpose**: Keeps bracket current with official CFP rankings throughout the season
+- **Trigger**: Automatic every 8 hours, or user clicks refresh button
+- **Progression**: API call initiated → Rankings fetched from ESPN → Team data with logos updated → Bracket refreshes with current teams → Toast notification confirms update
+- **Success criteria**: Teams persist between sessions, auto-update every 8 hours, manual refresh works, real team logos display
 
 ### "Left Out" Teams Display
 - **Functionality**: Shows teams ranked 13-14 who just missed the playoff
@@ -41,10 +41,12 @@ A College Football Playoff bracket visualization that displays the top 12 NCAAF 
 - **Success criteria**: Clear visual separation from playoff teams, still prominent enough to be noticed
 
 ## Edge Case Handling
-- **Empty/Default State**: Display sample teams or placeholders when no data exists yet
+- **Empty/Default State**: Display loading spinner with message while fetching from ESPN API
+- **API Failure**: Show error toast and retain last successful rankings data
 - **Mobile View**: Bracket collapses to vertical scrolling layout with maintained readability
 - **Long Team Names**: Truncate or wrap intelligently to maintain bracket structure
-- **Missing Trophy Image**: Show placeholder or styled championship element
+- **Missing Trophy Image**: Show fallback Trophy icon with styling
+- **Missing Team Logo**: Hide logo element gracefully, show only team name and rank
 
 ## Design Direction
 The design should feel authoritative and championship-caliber, evoking the prestige of college football's biggest stage with a modern, broadcast-quality aesthetic - minimal interface focusing entirely on the bracket structure and trophy as the centerpiece.
