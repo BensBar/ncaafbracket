@@ -10,6 +10,10 @@ interface TeamCardProps {
 }
 
 export function TeamCard({ rank, name, logo, delay = 0 }: TeamCardProps) {
+  const badgeColor = rank <= 12 
+    ? "bg-green-600 text-white" 
+    : "bg-red-600 text-white"
+
   return (
     <motion.div
       initial={{ opacity: 0, x: -20 }}
@@ -18,7 +22,7 @@ export function TeamCard({ rank, name, logo, delay = 0 }: TeamCardProps) {
     >
       <Card className="relative overflow-hidden bg-card hover:bg-card/80 transition-colors border-border p-3 min-w-[180px]">
         <div className="flex items-center gap-3">
-          <Badge className="bg-accent text-accent-foreground font-bold text-sm shrink-0 h-8 w-8 flex items-center justify-center rounded-full">
+          <Badge className={`${badgeColor} font-bold text-sm shrink-0 h-8 w-8 flex items-center justify-center rounded-full`}>
             {rank}
           </Badge>
           {logo && (
