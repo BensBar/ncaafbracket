@@ -3,6 +3,7 @@ import { useEffect, useState } from "react"
 import { TeamCard } from "@/components/TeamCard"
 import { BracketConnector } from "@/components/BracketConnector"
 import { EditBracketDialog } from "@/components/EditBracketDialog"
+import { ShareButtons } from "@/components/ShareButtons"
 import { Card } from "@/components/ui/card"
 import { Separator } from "@/components/ui/separator"
 import { Button } from "@/components/ui/button"
@@ -62,6 +63,19 @@ function App() {
     return () => clearInterval(interval)
   }, [lastUpdate])
 
+  const formatLastUpdate = () => {
+    if (!lastUpdate) return "Never"
+    const date = new Date(lastUpdate)
+    return date.toLocaleString('en-US', { 
+      month: 'short', 
+      day: 'numeric', 
+      year: 'numeric',
+      hour: 'numeric',
+      minute: '2-digit',
+      hour12: true
+    })
+  }
+
   const playoffTeams = teams?.slice(0, 12) || []
   const leftOutTeams = teams?.slice(12, 20) || []
 
@@ -102,22 +116,29 @@ function App() {
             <h1 className="text-3xl md:text-4xl font-bold uppercase tracking-tight mb-2">
               College Football Playoff
             </h1>
-            <div className="flex items-center gap-2 text-muted-foreground text-sm">
-              <Clock size={16} />
-              <span>Next update in: {nextUpdateIn || "Calculating..."}</span>
+            <div className="flex flex-col sm:flex-row sm:items-center gap-2 text-muted-foreground text-sm">
+              <div className="flex items-center gap-2">
+                <Clock size={16} />
+                <span>Next update in: {nextUpdateIn || "Calculating..."}</span>
+              </div>
+              <span className="hidden sm:inline">•</span>
+              <span className="text-xs">Last updated: {formatLastUpdate()}</span>
             </div>
           </div>
-          <div className="flex gap-2">
-            <Button 
-              onClick={() => updateRankings(true)} 
-              disabled={isLoading}
-              variant="outline"
-              className="gap-2"
-            >
-              <ArrowsClockwise size={18} weight="bold" className={isLoading ? "animate-spin" : ""} />
-              Refresh Now
-            </Button>
-            <EditBracketDialog teams={teams || []} onSave={(updatedTeams) => setTeams(() => updatedTeams)} />
+          <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
+            <div className="flex gap-2">
+              <Button 
+                onClick={() => updateRankings(true)} 
+                disabled={isLoading}
+                variant="outline"
+                className="gap-2"
+              >
+                <ArrowsClockwise size={18} weight="bold" className={isLoading ? "animate-spin" : ""} />
+                Refresh Now
+              </Button>
+              <EditBracketDialog teams={teams || []} onSave={(updatedTeams) => setTeams(() => updatedTeams)} />
+            </div>
+            <ShareButtons />
           </div>
         </div>
 

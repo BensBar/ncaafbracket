@@ -9,6 +9,12 @@
   body {
     font-family: 'Inter', system-ui, -apple-system, sans-serif;
   }
+  
+  /* Football-themed headers */
+  h1, h2, h3 {
+    font-family: 'Impact', 'Arial Black', sans-serif;
+    letter-spacing: 0.05em;
+  }
 }
 
 :root {
@@ -70,4 +76,39 @@
   --radius-xl: calc(var(--radius) * 2);
   --radius-2xl: calc(var(--radius) * 3);
   --radius-full: 9999px;
+}
+
+/* Enhanced hover effects for matchups */
+@layer components {
+  .team-card-hover {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  
+  .team-card-hover:hover {
+    transform: translateX(4px) scale(1.02);
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3), 0 10px 10px -5px rgba(0, 0, 0, 0.2);
+  }
+  
+  /* Football-themed accent colors */
+  .cfp-crimson {
+    color: oklch(0.45 0.18 25);
+  }
+  
+  .cfp-gold {
+    color: oklch(0.72 0.12 85);
+  }
+  
+  /* Mobile touch-friendly interactions */
+  @media (max-width: 1024px) {
+    .team-card-hover:active {
+      transform: scale(0.98);
+    }
+  }
+  
+  /* Ensure minimum touch target sizes on mobile (48x48px) */
+  @media (max-width: 768px) {
+    button, a {
+      min-height: 44px;
+    }
+  }
 }
