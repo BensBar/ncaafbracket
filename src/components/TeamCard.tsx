@@ -20,7 +20,7 @@ export function TeamCard({ rank, name, logo, delay = 0 }: TeamCardProps) {
       animate={{ opacity: 1, x: 0 }}
       transition={{ duration: 0.4, delay }}
     >
-      <Card className="team-card-hover relative overflow-hidden bg-card hover:bg-card/80 border-border p-3 min-w-[180px]">
+      <Card className="team-card-hover relative overflow-hidden bg-card hover:bg-card/80 border-border p-3 w-full sm:min-w-[180px]">
         <div className="flex items-center gap-3">
           <Badge className={`${badgeColor} font-bold text-sm shrink-0 h-8 w-8 flex items-center justify-center rounded-full`}>
             {rank}

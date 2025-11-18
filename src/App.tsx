@@ -109,7 +109,7 @@ function App() {
   }
 
   return (
-    <div className="min-h-screen bg-background text-foreground p-4 md:p-8">
+    <div className="min-h-screen bg-background text-foreground p-3 sm:p-4 md:p-8">
       <div className="max-w-7xl mx-auto">
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
           <div>
@@ -222,18 +222,18 @@ function App() {
             >
               <div className="relative">
                 <div className="absolute inset-0 bg-accent/20 blur-2xl rounded-full"></div>
-                <div className="relative bg-card/50 backdrop-blur-sm border-2 border-primary rounded-full p-6">
-                  <img src={trophyBlack} alt="Trophy" className="w-[60px] h-[60px] object-contain" />
+                <div className="relative bg-card/50 backdrop-blur-sm border-2 border-primary rounded-full p-4 sm:p-6">
+                  <img src={trophyBlack} alt="Trophy" className="w-[50px] h-[50px] sm:w-[60px] sm:h-[60px] object-contain" />
                 </div>
               </div>
               <div className="mt-3">
-                <div className="text-sm font-bold text-primary uppercase tracking-wider">National Championship</div>
+                <div className="text-xs sm:text-sm font-bold text-primary uppercase tracking-wider">National Championship</div>
               </div>
             </motion.div>
           </div>
 
           <div>
-            <h3 className="text-lg font-bold mb-3 text-primary uppercase">Quarterfinals</h3>
+            <h3 className="text-base sm:text-lg font-bold mb-3 text-primary uppercase">Quarterfinals</h3>
             <div className="space-y-3">
               {quarterfinalsSeeds[0] && <TeamCard rank={quarterfinalsSeeds[0].rank} name={quarterfinalsSeeds[0].name} logo={quarterfinalsSeeds[0].logo} />}
               {quarterfinalsSeeds[2] && <TeamCard rank={quarterfinalsSeeds[2].rank} name={quarterfinalsSeeds[2].name} logo={quarterfinalsSeeds[2].logo} />}
@@ -245,7 +245,7 @@ function App() {
           <Separator className="bg-border" />
 
           <div>
-            <h3 className="text-lg font-bold mb-3 text-primary uppercase">First Round</h3>
+            <h3 className="text-base sm:text-lg font-bold mb-3 text-primary uppercase">First Round</h3>
             <div className="space-y-4">
               {firstRoundMatchups.map((matchup, idx) => (
                 <Card key={idx} className="bg-secondary/50 border-border p-3">
