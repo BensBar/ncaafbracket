@@ -2,6 +2,7 @@ import { useKV } from "@github/spark/hooks"
 import { useEffect, useState } from "react"
 import { TeamCard } from "@/components/TeamCard"
 import { BracketConnector } from "@/components/BracketConnector"
+import { MobileBracketConnector } from "@/components/MobileBracketConnector"
 import { EditBracketDialog } from "@/components/EditBracketDialog"
 import { ShareButtons } from "@/components/ShareButtons"
 import { Card } from "@/components/ui/card"
@@ -212,49 +213,205 @@ function App() {
           </div>
         </div>
 
-        <div className="lg:hidden space-y-6">
-          <div className="text-center mb-8">
-            <motion.div 
-              className="flex flex-col items-center justify-center mb-6"
-              initial={{ opacity: 0, scale: 0.8 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.6 }}
-            >
-              <div className="relative">
-                <div className="absolute inset-0 bg-accent/20 blur-2xl rounded-full"></div>
-                <div className="relative bg-card/50 backdrop-blur-sm border-2 border-primary rounded-full p-4 sm:p-6">
-                  <img src={trophyBlack} alt="Trophy" className="w-[50px] h-[50px] sm:w-[60px] sm:h-[60px] object-contain" />
-                </div>
+        <div className="lg:hidden">
+          {/* Trophy at top - championship goal */}
+          <motion.div 
+            className="flex flex-col items-center justify-center mb-4"
+            initial={{ opacity: 0, scale: 0.8 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.6 }}
+          >
+            <div className="relative">
+              <div className="absolute inset-0 bg-accent/20 blur-2xl rounded-full"></div>
+              <div className="relative bg-card/50 backdrop-blur-sm border-2 border-primary rounded-full p-4 sm:p-6">
+                <img src={trophyBlack} alt="Trophy" className="w-[50px] h-[50px] sm:w-[60px] sm:h-[60px] object-contain" />
               </div>
-              <div className="mt-3">
-                <div className="text-xs sm:text-sm font-bold text-primary uppercase tracking-wider">National Championship</div>
-              </div>
-            </motion.div>
-          </div>
+            </div>
+            <div className="mt-3">
+              <div className="text-xs sm:text-sm font-bold text-primary uppercase tracking-wider">National Championship</div>
+            </div>
+          </motion.div>
 
-          <div>
-            <h3 className="text-base sm:text-lg font-bold mb-3 text-primary uppercase">Quarterfinals</h3>
-            <div className="space-y-3">
-              {quarterfinalsSeeds[0] && <TeamCard rank={quarterfinalsSeeds[0].rank} name={quarterfinalsSeeds[0].name} logo={quarterfinalsSeeds[0].logo} />}
-              {quarterfinalsSeeds[2] && <TeamCard rank={quarterfinalsSeeds[2].rank} name={quarterfinalsSeeds[2].name} logo={quarterfinalsSeeds[2].logo} />}
-              {quarterfinalsSeeds[4] && <TeamCard rank={quarterfinalsSeeds[4].rank} name={quarterfinalsSeeds[4].name} logo={quarterfinalsSeeds[4].logo} />}
-              {quarterfinalsSeeds[6] && <TeamCard rank={quarterfinalsSeeds[6].rank} name={quarterfinalsSeeds[6].name} logo={quarterfinalsSeeds[6].logo} />}
+          {/* Semifinals section - showing bracket structure */}
+          <div className="mb-6">
+            <h3 className="text-center text-sm font-bold mb-3 text-muted-foreground uppercase tracking-wide">Semifinals</h3>
+            
+            <div className="flex justify-center gap-4 mb-2">
+              <div className="flex-1 max-w-[160px]">
+                <div className="h-1 bg-border mx-auto"></div>
+              </div>
+              <div className="flex-1 max-w-[160px]">
+                <div className="h-1 bg-border mx-auto"></div>
+              </div>
+            </div>
+            
+            {/* Connector from semifinals to championship */}
+            <div className="flex justify-center">
+              <MobileBracketConnector height={40} type="quarterfinal" />
             </div>
           </div>
 
-          <Separator className="bg-border" />
+          {/* Quarterfinals - 4 teams competing */}
+          <div className="mb-6">
+            <h3 className="text-center text-base sm:text-lg font-bold mb-4 text-primary uppercase">Quarterfinals</h3>
+            
+            <div className="grid grid-cols-2 gap-3 mb-3">
+              <div className="space-y-2">
+                {quarterfinalsSeeds[0] && (
+                  <motion.div
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ duration: 0.4, delay: 0.1 }}
+                  >
+                    <TeamCard rank={quarterfinalsSeeds[0].rank} name={quarterfinalsSeeds[0].name} logo={quarterfinalsSeeds[0].logo} />
+                  </motion.div>
+                )}
+              </div>
+              <div className="space-y-2">
+                {quarterfinalsSeeds[2] && (
+                  <motion.div
+                    initial={{ opacity: 0, x: 20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ duration: 0.4, delay: 0.15 }}
+                  >
+                    <TeamCard rank={quarterfinalsSeeds[2].rank} name={quarterfinalsSeeds[2].name} logo={quarterfinalsSeeds[2].logo} />
+                  </motion.div>
+                )}
+              </div>
+            </div>
 
-          <div>
-            <h3 className="text-base sm:text-lg font-bold mb-3 text-primary uppercase">First Round</h3>
-            <div className="space-y-4">
-              {firstRoundMatchups.map((matchup, idx) => (
-                <Card key={idx} className="bg-secondary/50 border-border p-3">
-                  <div className="space-y-2">
-                    <TeamCard rank={matchup[0].rank} name={matchup[0].name} logo={matchup[0].logo} />
-                    <TeamCard rank={matchup[1].rank} name={matchup[1].name} logo={matchup[1].logo} />
+            {/* Visual connector showing progression */}
+            <div className="flex justify-center gap-4 mb-3">
+              <div className="flex-1 max-w-[160px]">
+                <div className="h-8 border-l-2 border-r-2 border-b-2 border-border rounded-bl-lg rounded-br-lg"></div>
+              </div>
+              <div className="flex-1 max-w-[160px]">
+                <div className="h-8 border-l-2 border-r-2 border-b-2 border-border rounded-bl-lg rounded-br-lg"></div>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 gap-3">
+              <div className="space-y-2">
+                {quarterfinalsSeeds[4] && (
+                  <motion.div
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ duration: 0.4, delay: 0.2 }}
+                  >
+                    <TeamCard rank={quarterfinalsSeeds[4].rank} name={quarterfinalsSeeds[4].name} logo={quarterfinalsSeeds[4].logo} />
+                  </motion.div>
+                )}
+              </div>
+              <div className="space-y-2">
+                {quarterfinalsSeeds[6] && (
+                  <motion.div
+                    initial={{ opacity: 0, x: 20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ duration: 0.4, delay: 0.25 }}
+                  >
+                    <TeamCard rank={quarterfinalsSeeds[6].rank} name={quarterfinalsSeeds[6].name} logo={quarterfinalsSeeds[6].logo} />
+                  </motion.div>
+                )}
+              </div>
+            </div>
+          </div>
+
+          {/* Visual separator */}
+          <div className="my-6 flex items-center">
+            <div className="flex-1 h-px bg-border"></div>
+            <div className="px-4 text-xs font-semibold text-muted-foreground uppercase">Round 1</div>
+            <div className="flex-1 h-px bg-border"></div>
+          </div>
+
+          {/* First Round matchups with connections to quarterfinals */}
+          <div className="space-y-6">
+            <h3 className="text-center text-base sm:text-lg font-bold text-primary uppercase">First Round</h3>
+            
+            {/* Top half - feeds into top 2 quarterfinal spots */}
+            <div className="grid grid-cols-2 gap-3">
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.4, delay: 0.3 }}
+              >
+                <Card className="bg-secondary/50 border-border p-2">
+                  <div className="space-y-1.5">
+                    <TeamCard rank={firstRoundMatchups[0][0].rank} name={firstRoundMatchups[0][0].name} logo={firstRoundMatchups[0][0].logo} />
+                    <div className="flex justify-center">
+                      <div className="text-xs text-muted-foreground font-semibold">VS</div>
+                    </div>
+                    <TeamCard rank={firstRoundMatchups[0][1].rank} name={firstRoundMatchups[0][1].name} logo={firstRoundMatchups[0][1].logo} />
                   </div>
+                  {/* Connector showing winner advances */}
+                  <div className="flex justify-center mt-2">
+                    <div className="h-8 w-px bg-border"></div>
+                  </div>
+                  <div className="text-center text-[10px] text-muted-foreground uppercase mt-1">Winner vs #{quarterfinalsSeeds[0]?.rank}</div>
                 </Card>
-              ))}
+              </motion.div>
+
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.4, delay: 0.35 }}
+              >
+                <Card className="bg-secondary/50 border-border p-2">
+                  <div className="space-y-1.5">
+                    <TeamCard rank={firstRoundMatchups[1][0].rank} name={firstRoundMatchups[1][0].name} logo={firstRoundMatchups[1][0].logo} />
+                    <div className="flex justify-center">
+                      <div className="text-xs text-muted-foreground font-semibold">VS</div>
+                    </div>
+                    <TeamCard rank={firstRoundMatchups[1][1].rank} name={firstRoundMatchups[1][1].name} logo={firstRoundMatchups[1][1].logo} />
+                  </div>
+                  <div className="flex justify-center mt-2">
+                    <div className="h-8 w-px bg-border"></div>
+                  </div>
+                  <div className="text-center text-[10px] text-muted-foreground uppercase mt-1">Winner vs #{quarterfinalsSeeds[2]?.rank}</div>
+                </Card>
+              </motion.div>
+            </div>
+
+            {/* Bottom half - feeds into bottom 2 quarterfinal spots */}
+            <div className="grid grid-cols-2 gap-3">
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.4, delay: 0.4 }}
+              >
+                <Card className="bg-secondary/50 border-border p-2">
+                  <div className="space-y-1.5">
+                    <TeamCard rank={firstRoundMatchups[2][0].rank} name={firstRoundMatchups[2][0].name} logo={firstRoundMatchups[2][0].logo} />
+                    <div className="flex justify-center">
+                      <div className="text-xs text-muted-foreground font-semibold">VS</div>
+                    </div>
+                    <TeamCard rank={firstRoundMatchups[2][1].rank} name={firstRoundMatchups[2][1].name} logo={firstRoundMatchups[2][1].logo} />
+                  </div>
+                  <div className="flex justify-center mt-2">
+                    <div className="h-8 w-px bg-border"></div>
+                  </div>
+                  <div className="text-center text-[10px] text-muted-foreground uppercase mt-1">Winner vs #{quarterfinalsSeeds[4]?.rank}</div>
+                </Card>
+              </motion.div>
+
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.4, delay: 0.45 }}
+              >
+                <Card className="bg-secondary/50 border-border p-2">
+                  <div className="space-y-1.5">
+                    <TeamCard rank={firstRoundMatchups[3][0].rank} name={firstRoundMatchups[3][0].name} logo={firstRoundMatchups[3][0].logo} />
+                    <div className="flex justify-center">
+                      <div className="text-xs text-muted-foreground font-semibold">VS</div>
+                    </div>
+                    <TeamCard rank={firstRoundMatchups[3][1].rank} name={firstRoundMatchups[3][1].name} logo={firstRoundMatchups[3][1].logo} />
+                  </div>
+                  <div className="flex justify-center mt-2">
+                    <div className="h-8 w-px bg-border"></div>
+                  </div>
+                  <div className="text-center text-[10px] text-muted-foreground uppercase mt-1">Winner vs #{quarterfinalsSeeds[6]?.rank}</div>
+                </Card>
+              </motion.div>
             </div>
           </div>
         </div>
